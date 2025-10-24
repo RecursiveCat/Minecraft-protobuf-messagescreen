@@ -38,7 +38,7 @@
 
 ---
 
-## Инструкция по запуска
+## Инструкция для запуска
 1. Склонируйте проект
 ```
 git clone https://github.com/RecursiveCat/Minecraft-protobuf-messagescreen.git
