@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "protobuf-demo",
+	"version": "${version}",
+	"name": "Protobuf Demo",
+	"description": "Demo mod with Protobuf and PostgreSQL",
+	"authors": [
+		"Roman Chipura"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/protobuf-demo/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.example.fabricmod.ProtobufDemo"
+		],
+		"client": [
+			"com.example.fabricmod.ProtobufDemoClient"
+		]
+	},
+	"mixins": [
+		"protobuf-demo.mixins.json",
+		{
+			"config": "protobuf-demo.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.17.3",
+		"minecraft": "~1.21.8",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

@@ -1,0 +1,28 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: minecraft-postgres
+    environment:
+      POSTGRES_DB: minecraft
+      POSTGRES_USER: minecraft_user
+      POSTGRES_PASSWORD: minecraft_pass
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U minecraft_user -d minecraft"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - minecraft-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  minecraft-network:
+    driver: bridge

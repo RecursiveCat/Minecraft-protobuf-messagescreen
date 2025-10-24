@@ -1,0 +1,136 @@
+plugins {
+    id 'fabric-loom' version "${loom_version}"
+    id 'maven-publish'
+    id 'com.google.protobuf' version '0.9.4'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+repositories {
+    mavenCentral()
+}
+
+loom {
+    splitEnvironmentSourceSets()
+
+    mods {
+        "protobuf-demo" {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.client
+        }
+    }
+
+    runs {
+        client {
+            client()
+            configName = "Fabric Client"
+            ideConfigGenerated(true)
+            runDir("run")
+            programArgs("--username=Dev", "--uuid=00000000-0000-0000-0000-000000000000")
+            vmArgs("-Dfabric.development=true")
+        }
+        server {
+            server()
+            configName = "Fabric Server"
+            ideConfigGenerated(true)
+            runDir("run")
+        }
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    implementation 'com.google.protobuf:protobuf-java:3.25.5'
+
+    include implementation('org.postgresql:postgresql:42.7.4')
+
+    include implementation('org.hibernate.orm:hibernate-core:6.6.4.Final')
+    include implementation('jakarta.persistence:jakarta.persistence-api:3.2.0')
+    include implementation('org.glassfish.jaxb:jaxb-runtime:4.0.5')
+
+    implementation 'org.slf4j:slf4j-api:2.0.16'
+
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+    compileOnly('org.projectlombok:lombok:1.18.30') {
+        transitive = false
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.25.5'
+    }
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java {}
+            }
+        }
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'build/generated/source/proto/main/java'
+        }
+    }
+}
+
+processResources {
+    inputs.property "version", project.version
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    filesMatching("fabric.mod.json") {
+        expand "version": inputs.properties.version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 21
+    it.options.encoding = 'UTF-8'
+}
+
+tasks.withType(Jar).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+java {
+    withSourcesJar()
+
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+jar {
+    inputs.property "archivesName", project.base.archivesName
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from("LICENSE") {
+        rename { "${it}_${inputs.properties.archivesName}"}
+    }
+}
+
+publishing {
+    publications {
+        create("mavenJava", MavenPublication) {
+            artifactId = project.archives_base_name
+            from components.java
+        }
+    }
+
+    repositories {
+    }
+}
